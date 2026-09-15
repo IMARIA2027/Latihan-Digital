@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latihan IMARIA Nasional 2027</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Merriweather Sans', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }
+        .header-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+        }
+        .title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .controls button {
+            font-family: 'Merriweather Sans', sans-serif;
+            padding: 6px 12px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-online { 
+            background-color: #d4edda; 
+            color: #155724; 
+            border-color: #c3e6cb; 
+        }
+        .btn-online:disabled { 
+            background-color: #e2ede6; 
+            color: #7a9a83; 
+            opacity: 1; 
+            cursor: not-allowed; 
+            border-color: #c5d8cc; 
+        }
+        .btn-scoring { background-color: #cfe2ff; color: #084298; }
+        .btn-reset { background-color: #f8d7da; color: #721c24; }
+        .timer {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .score-box {
+            border: 2px solid #000;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            background: #fff;
+        }
+        .table-section {
+            background: #fff;
+            margin-bottom: 15px;
+            border: 1px solid #999;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #999;
+            padding: 3px;
+            font-size: 14px;
+        }
+        th.col-no, td.col-no {
+            width: 45px;
+            min-width: 45px;
+            max-width: 45px;
+        }
+        th {
+            background-color: #e2e2e2;
+            font-size: 11px;
+            font-style: italic;
+            font-weight: normal;
+        }
+        .ans-input {
+            font-family: 'Merriweather Sans', sans-serif;
+            width: 80%;
+            padding: 2px;
+            text-align: center;
+            font-size: 13px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #ffffff;
+        }
+        .ans-input:disabled {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+        .number-row td:not(.col-no) {
+            font-family: 'Merriweather Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            font-style: italic; 
+            height: 22px;
+            text-align: right;
+            padding-right: 15px; 
+        }
+        .correct { background-color: #d4edda !important; }
+        .incorrect { background-color: #f8d7da !important; }
+
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        .custom-modal {
+            background: #ffffff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 320px;
+        }
+        .custom-modal-title {
+            color: #dc3545;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+        .custom-modal-btn {
+            background-color: #004085;
+            color: white;
+            border: none;
+            padding: 10px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Merriweather Sans', sans-serif;
+        }
+        .custom-modal-btn:hover {
+            background-color: #002752;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div>
+            <span class="title">Latihan IMARIA Nasional 2027</span>
+            <div style="font-size: 13px; margin-top: 5px;">
+                30 Soal masing-masing nilai 10 &nbsp;|&nbsp; 
+                <button class="btn-online" id="startBtn" onclick="startTest()">Mulai Mengerjakan</button>
+                <button class="btn-scoring" id="finishBtn" onclick="finishTest()">Selesai</button>
+                <button class="btn-reset" onclick="resetTest()">Atur Ulang</button>
+                <span class="timer" id="timerDisplay">Waktu 01:00</span>
+            </div>
+        </div>
+        <div>
+            <span style="font-weight: bold; font-size: 15px;">Kategori A - MA Tambah Kurang</span>
+            <div style="font-size: 12px; margin-top: 4px;">Batas waktu: 1 menit</div>
+        </div>
+        <div class="score-box">
+            NILAI <span id="finalScore">0</span>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <table id="gridPart1"></table>
+    </div>
+
+    <div class="table-section">
+        <table id="gridPart2"></table>
+    </div>
+
+    <div class="table-section">
+        <table id="gridPart3"></table>
+    </div>
+
+    <div class="custom-modal-overlay" id="timeUpModal">
+        <div class="custom-modal">
+            <div class="custom-modal-title">Waktu Habis</div>
+            <button class="custom-modal-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let timerInterval;
+        let timeLeft = 60;
+        let isTestActive = false;
+
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function isDirectOperation(currentVal, val, isMinus) {
+            let lowerCurr = currentVal % 5;
+            let upperCurr = Math.floor(currentVal / 5);
+
+            if (isMinus) {
+                if (currentVal - val < 0) return false;
+                let valLower = val % 5;
+                let valUpper = Math.floor(val / 5);
+                return (lowerCurr >= valLower) && (upperCurr >= valUpper);
+            } else {
+                if (currentVal + val > 9) return false;
+                let valLower = val % 5;
+                let valUpper = Math.floor(val / 5);
+                return ((lowerCurr + valLower) <= 4) && ((upperCurr + valUpper) <= 1);
+            }
+        }
+
+        function generateQuestions() {
+            questions = [];
+            let doubleFiveQIndex = Math.floor(Math.random() * 5) + 6;
+
+            for (let i = 1; i <= 10; i++) {
+                let rowCount = 4;
+                let validQuestion = false;
+                let numbersList = [];
+                let currentTotal = 0;
+
+                while (!validQuestion) {
+                    numbersList = [];
+                    let tempTotal = 0;
+
+                    if (i >= 1 && i <= 5) {
+                        let rawValues = shuffle([1, 2, 3, 4]);
+                        let minusIdx = Math.floor(Math.random() * 3) + 1;
+                        let validSequence = true;
+
+                        for (let r = 0; r < rowCount; r++) {
+                            let val = rawValues[r];
+                            let isMinus = (r === minusIdx);
+
+                            if (isDirectOperation(tempTotal, val, isMinus)) {
+                                if (isMinus) {
+                                    tempTotal -= val;
+                                    numbersList.push({ display: `- ${val}`, val: -val });
+                                } else {
+                                    tempTotal += val;
+                                    numbersList.push({ display: `${val}`, val: val });
+                                }
+                            } else {
+                                validSequence = false;
+                                break;
+                            }
+                        }
+
+                        if (validSequence && tempTotal >= 0) {
+                            currentTotal = tempTotal;
+                            validQuestion = true;
+                        }
+
+                    } else if (i >= 6 && i <= 10) {
+                        let rawValues = [];
+                        let minusIdx = -1;
+
+                        if (i === doubleFiveQIndex) {
+                            let sub1to4 = shuffle([1, 2, 3, 4]).slice(0, 2);
+                            rawValues = shuffle([5, 5, sub1to4[0], sub1to4[1]]);
+                            
+                            let fiveIndices = [];
+                            for (let idx = 0; idx < rawValues.length; idx++) {
+                                if (rawValues[idx] === 5 && idx > 0) {
+                                    fiveIndices.push(idx);
+                                }
+                            }
+                            if (fiveIndices.length > 0) {
+                                minusIdx = fiveIndices[Math.floor(Math.random() * fiveIndices.length)];
+                            } else {
+                                continue;
+                            }
+                        } else {
+                            rawValues = shuffle([1, 2, 3, 4, 5]).slice(0, 4);
+                            minusIdx = Math.floor(Math.random() * 3) + 1;
+                        }
+
+                        let validSequence = true;
+                        for (let r = 0; r < rowCount; r++) {
+                            let val = rawValues[r];
+                            let isMinus = (r === minusIdx);
+
+                            if (isDirectOperation(tempTotal, val, isMinus)) {
+                                if (isMinus) {
+                                    tempTotal -= val;
+                                    numbersList.push({ display: `- ${val}`, val: -val });
+                                } else {
+                                    tempTotal += val;
+                                    numbersList.push({ display: `${val}`, val: val });
+                                }
+                            } else {
+                                validSequence = false;
+                                break;
+                            }
+                        }
+
+                        if (validSequence && tempTotal >= 0) {
+                            currentTotal = tempTotal;
+                            validQuestion = true;
+                        }
+                    }
+                }
+
+                questions.push({
+                    id: i,
+                    rowCount: 4,
+                    rows: numbersList,
+                    answer: currentTotal
+                });
+            }
+
+            let block11To20Valid = false;
+            let block11To20Questions = [];
+
+            while (!block11To20Valid) {
+                block11To20Questions = [];
+                let digitsUsed = new Set();
+
+                for (let i = 11; i <= 20; i++) {
+                    let rowCount = 4;
+                    let validQuestion = false;
+                    let numbersList = [];
+                    let currentTotal = 0;
+                    let attempts = 0;
+
+                    while (!validQuestion && attempts < 100) {
+                        attempts++;
+                        numbersList = [];
+                        let tempTotal = 0;
+                        let rawValues = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 4);
+                        let minusIdx = Math.floor(Math.random() * 3) + 1;
+                        let validSequence = true;
+
+                        for (let r = 0; r < rowCount; r++) {
+                            let val = rawValues[r];
+                            let isMinus = (r === minusIdx);
+
+                            if (isDirectOperation(tempTotal, val, isMinus)) {
+                                if (isMinus) {
+                                    tempTotal -= val;
+                                    numbersList.push({ display: `- ${val}`, val: -val });
+                                } else {
+                                    tempTotal += val;
+                                    numbersList.push({ display: `${val}`, val: val });
+                                }
+                            } else {
+                                validSequence = false;
+                                break;
+                            }
+                        }
+
+                        if (validSequence && tempTotal >= 0) {
+                            currentTotal = tempTotal;
+                            validQuestion = true;
+                            rawValues.forEach(v => digitsUsed.add(v));
+                        }
+                    }
+
+                    if (validQuestion) {
+                        block11To20Questions.push({
+                            id: i,
+                            rowCount: 4,
+                            rows: numbersList,
+                            answer: currentTotal
+                        });
+                    } else {
+                        break;
+                    }
+                }
+
+                if (block11To20Questions.length === 10 && digitsUsed.size === 9) {
+                    block11To20Valid = true;
+                }
+            }
+
+            questions.push(...block11To20Questions);
+
+            let block21To30Valid = false;
+            let block21To30Questions = [];
+
+            while (!block21To30Valid) {
+                block21To30Questions = [];
+                let digitsUsed21To30 = new Set();
+
+                for (let i = 21; i <= 30; i++) {
+                    let rowCount = 4;
+                    let validQuestion = false;
+                    let numbersList = [];
+                    let currentTotal = 0;
+                    let attempts = 0;
+
+                    while (!validQuestion && attempts < 100) {
+                        attempts++;
+                        numbersList = [];
+                        let tempTotal = 0;
+                        let rawValues = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 4);
+                        let minusIdx = Math.floor(Math.random() * 3) + 1;
+                        let validSequence = true;
+
+                        for (let r = 0; r < rowCount; r++) {
+                            let val = rawValues[r];
+                            let isMinus = (r === minusIdx);
+
+                            if (isMinus) {
+                                if (tempTotal - val >= 0) {
+                                    tempTotal -= val;
+                                    numbersList.push({ display: `- ${val}`, val: -val });
+                                } else {
+                                    validSequence = false;
+                                    break;
+                                }
+                            } else {
+                                tempTotal += val;
+                                numbersList.push({ display: `${val}`, val: val });
+                            }
+                        }
+
+                        if (validSequence && tempTotal >= 0) {
+                            currentTotal = tempTotal;
+                            validQuestion = true;
+                            rawValues.forEach(v => digitsUsed21To30.add(v));
+                        }
+                    }
+
+                    if (validQuestion) {
+                        block21To30Questions.push({
+                            id: i,
+                            rowCount: 4,
+                            rows: numbersList,
+                            answer: currentTotal
+                        });
+                    } else {
+                        break;
+                    }
+                }
+
+                if (block21To30Questions.length === 10 && digitsUsed21To30.size === 9) {
+                    block21To30Valid = true;
+                }
+            }
+
+            questions.push(...block21To30Questions);
+        }
+
+        function renderTablePart(start, end, rowCount, elementId) {
+            let table = document.getElementById(elementId);
+            let html = '<thead><tr><th class="col-no">NO</th>';
+            
+            for (let i = start; i <= end; i++) {
+                html += `<th>${i}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            for (let r = 0; r < rowCount; r++) {
+                html += `<tr class="number-row"><td class="col-no" style="text-align: center; padding-right: 0; font-weight: normal; font-style: normal; font-size: 11px; background-color: #f8f9fa;">${r+1}</td>`;
+                for (let i = start - 1; i < end; i++) {
+                    let val = (isTestActive && questions[i] && questions[i].rows[r]) ? questions[i].rows[r].display : '';
+                    html += `<td>${val}</td>`;
+                }
+                html += '</tr>';
+            }
+
+            html += '<tr><td class="col-no" style="text-align: center; font-weight: bold; font-size: 11px; font-style: normal; background-color: #f8f9fa;">Jawaban</td>';
+            for (let i = start; i <= end; i++) {
+                let disabledAttr = isTestActive ? '' : 'disabled';
+                let displayVal = isTestActive ? '' : '';
+                html += `<td><input type="text" class="ans-input" id="ans-${i}" data-qid="${i}" value="${displayVal}" ${disabledAttr} onkeydown="handleEnter(event, ${i})"></td>`;
+            }
+            html += '</tr></tbody>';
+
+            table.innerHTML = html;
+        }
+
+        function handleEnter(event, currentId) {
+            if (!isTestActive) return;
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                let nextId = currentId + 1;
+                let nextInput = document.getElementById(`ans-${nextId}`);
+                if (nextInput) {
+                    nextInput.focus();
+                    nextInput.select();
+                } else if (currentId === 30) {
+                    finishTest();
+                }
+            }
+        }
+
+        function renderTables() {
+            renderTablePart(1, 10, 4, 'gridPart1');
+            renderTablePart(11, 20, 4, 'gridPart2');
+            renderTablePart(21, 30, 4, 'gridPart3');
+        }
+
+        function startTest() {
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            generateQuestions(); 
+            isTestActive = true;
+            renderTables();
+            
+            document.getElementById('startBtn').disabled = true;
+
+            setTimeout(() => {
+                let firstInput = document.getElementById('ans-1');
+                if (firstInput) {
+                    firstInput.focus();
+                    firstInput.select();
+                }
+            }, 50);
+
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    let minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                    let seconds = String(timeLeft % 60).padStart(2, '0');
+                    document.getElementById('timerDisplay').innerText = `Sedang mengerjakan ${minutes}:${seconds}`;
+                } else {
+                    clearInterval(timerInterval);
+                    isTestActive = false;
+                    disableInputs();
+                    document.getElementById('timeUpModal').style.display = 'flex';
+                    calculateScore();
+                }
+            }, 1000);
+        }
+
+        function finishTest() {
+            if (!isTestActive) return;
+            clearInterval(timerInterval);
+            isTestActive = false;
+            document.getElementById('startBtn').disabled = false;
+            disableInputs();
+            calculateScore();
+        }
+
+        function disableInputs() {
+            let inputs = document.querySelectorAll('.ans-input');
+            inputs.forEach(input => {
+                input.disabled = true;
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('timeUpModal').style.display = 'none';
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        function calculateScore() {
+            let score = 0;
+            questions.forEach(q => {
+                let inputElem = document.getElementById(`ans-${q.id}`);
+                if (!inputElem) return;
+                let valStr = inputElem.value.trim();
+                
+                inputElem.classList.remove('correct', 'incorrect');
+
+                if (valStr !== "" && valStr !== "-") {
+                    let hasDecimal = valStr.includes('.') || valStr.includes(',');
+                    let normalizedStr = valStr.replace(',', '.');
+                    let parsedNum = parseFloat(normalizedStr);
+
+                    if (!hasDecimal && !isNaN(parsedNum) && parsedNum === q.answer && Number.isInteger(parsedNum)) {
+                        score += 10;
+                        inputElem.classList.add('correct');
+                    } else {
+                        inputElem.classList.add('incorrect');
+                    }
+                }
+            });
+            document.getElementById('finalScore').innerText = score;
+        }
+
+        function resetTest() {
+            clearInterval(timerInterval);
+            isTestActive = false;
+            document.getElementById('timerDisplay').innerText = "Waktu 01:00";
+            document.getElementById('finalScore').innerText = "0";
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('timeUpModal').style.display = 'none';
+
+            renderTables();
+        }
+
+        renderTables();
+    </script>
+</body>
+</html>

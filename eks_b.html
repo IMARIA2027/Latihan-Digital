@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latihan IMARIA Nasional 2027</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Merriweather Sans', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }
+        .header-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+        }
+        .title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .controls button {
+            font-family: 'Merriweather Sans', sans-serif;
+            padding: 6px 12px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .controls button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .btn-online { background-color: #d4edda; color: #155724; }
+        .btn-finish { background-color: #cce5ff; color: #004085; }
+        .btn-reset { background-color: #f8d7da; color: #721c24; }
+        
+        .timer {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .score-box {
+            border: 2px solid #000;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            background: #fff;
+        }
+
+        .table-section {
+            background: #fff;
+            margin-bottom: 15px;
+            border: 1px solid #999;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #999;
+            padding: 3px;
+            font-size: 14px;
+        }
+        th.col-no, td.col-no {
+            width: 45px;
+            min-width: 45px;
+            max-width: 45px;
+        }
+        th {
+            background-color: #e2e2e2;
+            font-size: 11px;
+            font-style: italic;
+            font-weight: normal;
+        }
+        .ans-input {
+            font-family: 'Merriweather Sans', sans-serif;
+            width: 80%;
+            padding: 2px;
+            text-align: center;
+            font-size: 13px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .number-row td:not(.col-no) {
+            font-family: 'Merriweather Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            font-style: italic;
+            height: 22px;
+            text-align: right;
+            padding-right: 15px;
+        }
+        .correct { background-color: #d4edda !important; }
+        .incorrect { background-color: #f8d7da !important; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 25px 30px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 260px;
+            border: 1px solid #ccc;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #dc3545;
+            font-size: 20px;
+        }
+        .modal-btn {
+            background-color: #004085;
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Merriweather Sans', sans-serif;
+        }
+        .modal-btn:hover {
+            background-color: #002752;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay" id="timeUpModal">
+        <div class="modal-content">
+            <h3>Waktu Habis</h3>
+            <button class="modal-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <div class="header-container">
+        <div>
+            <span class="title">Latihan IMARIA Nasional 2027</span>
+            <div style="font-size: 13px; margin-top: 5px;" class="controls">
+                30 Soal masing-masing nilai 10 &nbsp;|&nbsp; 
+                <button id="startBtn" class="btn-online" onclick="startTest()">Mulai Mengerjakan</button>
+                <button class="btn-finish" onclick="finishTest()">Selesai</button>
+                <button class="btn-reset" onclick="resetTest()">Atur Ulang</button>
+                <span class="timer" id="timerDisplay">Siap mengerjakan 03:00</span>
+            </div>
+        </div>
+        <div>
+            <span style="font-weight: bold; font-size: 15px;">Kategori B - Ekstra</span>
+            <div style="font-size: 12px; margin-top: 4px;">Batas waktu: 1 menit</div>
+        </div>
+        <div class="score-box">
+            NILAI <span id="finalScore">0</span>
+        </div>
+    </div>
+
+    <!-- Tabel 1: No 1-10 (4 Baris - dari 10 Set Bank Soal) -->
+    <div class="table-section">
+        <table id="gridPart1"></table>
+    </div>
+
+    <!-- Tabel 2: No 11-20 (10 Baris) -->
+    <div class="table-section">
+        <table id="gridPart2"></table>
+    </div>
+
+    <!-- Tabel 3: No 21-30 (10 Baris) -->
+    <div class="table-section">
+        <table id="gridPart3"></table>
+    </div>
+
+    <script>
+        let questions = [];
+        let timerInterval;
+        let timeLeft = 60;
+        let isTestActive = false;
+
+        // 10 Set Bank Soal 4 Baris (masing-masing 10 kolom)
+        const bankSoal10Set = [
+    // Set 1
+    [
+        [{display:"43",val:43}, {display:"56",val:56}, {display:"- 98",val:-98}, {display:"10",val:10}],
+        [{display:"97",val:97}, {display:"- 46",val:-46}, {display:"30",val:30}, {display:"18",val:18}],
+        [{display:"93",val:93}, {display:"- 71",val:-71}, {display:"26",val:26}, {display:"50",val:50}],
+        [{display:"65",val:65}, {display:"34",val:34}, {display:"- 89",val:-89}, {display:"72",val:72}],
+        [{display:"48",val:48}, {display:"50",val:50}, {display:"- 72",val:-72}, {display:"61",val:61}],
+        [{display:"17",val:17}, {display:"30",val:30}, {display:"52",val:52}, {display:"- 48",val:-48}],
+        [{display:"98",val:98}, {display:"- 45",val:-45}, {display:"20",val:20}, {display:"16",val:16}],
+        [{display:"25",val:25}, {display:"74",val:74}, {display:"- 96",val:-96}, {display:"30",val:30}],
+        [{display:"51",val:51}, {display:"48",val:48}, {display:"- 93",val:-93}, {display:"72",val:72}],
+        [{display:"98",val:98}, {display:"- 73",val:-73}, {display:"62",val:62}, {display:"10",val:10}]
+    ],
+    // Set 2
+    [
+        [{display:"32",val:32}, {display:"67",val:67}, {display:"- 89",val:-89}, {display:"50",val:50}],
+        [{display:"17",val:17}, {display:"30",val:30}, {display:"52",val:52}, {display:"- 94",val:-94}],
+        [{display:"54",val:54}, {display:"32",val:32}, {display:"- 86",val:-86}, {display:"90",val:90}],
+        [{display:"48",val:48}, {display:"51",val:51}, {display:"- 72",val:-72}, {display:"60",val:60}],
+        [{display:"65",val:65}, {display:"34",val:34}, {display:"- 89",val:-89}, {display:"21",val:21}],
+        [{display:"97",val:97}, {display:"- 82",val:-82}, {display:"10",val:10}, {display:"64",val:64}],
+        [{display:"28",val:28}, {display:"70",val:70}, {display:"- 93",val:-93}, {display:"14",val:14}],
+        [{display:"86",val:86}, {display:"13",val:13}, {display:"- 75",val:-75}, {display:"20",val:20}],
+        [{display:"79",val:79}, {display:"10",val:10}, {display:"- 54",val:-54}, {display:"63",val:63}],
+        [{display:"38",val:38}, {display:"51",val:51}, {display:"- 79",val:-79}, {display:"64",val:64}]
+    ],
+    // Set 3
+    [
+        [{display:"79",val:79}, {display:"20",val:20}, {display:"- 84",val:-84}, {display:"63",val:63}],
+        [{display:"16",val:16}, {display:"72",val:72}, {display:"- 85",val:-85}, {display:"40",val:40}],
+        [{display:"98",val:98}, {display:"- 67",val:-67}, {display:"50",val:50}, {display:"13",val:13}],
+        [{display:"82",val:82}, {display:"17",val:17}, {display:"- 94",val:-94}, {display:"60",val:60}],
+        [{display:"65",val:65}, {display:"34",val:34}, {display:"- 98",val:-98}, {display:"21",val:21}],
+        [{display:"65",val:65}, {display:"32",val:32}, {display:"- 87",val:-87}, {display:"14",val:14}],
+        [{display:"23",val:23}, {display:"75",val:75}, {display:"- 98",val:-98}, {display:"40",val:40}],
+        [{display:"89",val:89}, {display:"- 72",val:-72}, {display:"50",val:50}, {display:"31",val:31}],
+        [{display:"46",val:46}, {display:"52",val:52}, {display:"- 93",val:-93}, {display:"10",val:10}],
+        [{display:"43",val:43}, {display:"56",val:56}, {display:"- 91",val:-91}, {display:"70",val:70}]
+    ],
+    // Set 4
+    [
+        [{display:"64",val:64}, {display:"25",val:25}, {display:"- 79",val:-79}, {display:"30",val:30}],
+        [{display:"98",val:98}, {display:"- 76",val:-76}, {display:"21",val:21}, {display:"50",val:50}],
+        [{display:"89",val:89}, {display:"- 74",val:-74}, {display:"63",val:63}, {display:"20",val:20}],
+        [{display:"41",val:41}, {display:"56",val:56}, {display:"- 87",val:-87}, {display:"32",val:32}],
+        [{display:"43",val:43}, {display:"56",val:56}, {display:"- 71",val:-71}, {display:"20",val:20}],
+        [{display:"74",val:74}, {display:"15",val:15}, {display:"- 89",val:-89}, {display:"62",val:62}],
+        [{display:"98",val:98}, {display:"- 63",val:-63}, {display:"54",val:54}, {display:"10",val:10}],
+        [{display:"98",val:98}, {display:"- 47",val:-47}, {display:"30",val:30}, {display:"12",val:12}],
+        [{display:"69",val:69}, {display:"30",val:30}, {display:"- 78",val:-78}, {display:"51",val:51}],
+        [{display:"59",val:59}, {display:"40",val:40}, {display:"- 83",val:-83}, {display:"21",val:21}]
+    ],
+    // Set 5
+    [
+        [{display:"94",val:94}, {display:"- 83",val:-83}, {display:"57",val:57}, {display:"21",val:21}],
+        [{display:"78",val:78}, {display:"20",val:20}, {display:"- 63",val:-63}, {display:"14",val:14}],
+        [{display:"69",val:69}, {display:"20",val:20}, {display:"- 87",val:-87}, {display:"45",val:45}],
+        [{display:"89",val:89}, {display:"- 76",val:-76}, {display:"51",val:51}, {display:"30",val:30}],
+        [{display:"64",val:64}, {display:"20",val:20}, {display:"- 73",val:-73}, {display:"51",val:51}],
+        [{display:"26",val:26}, {display:"73",val:73}, {display:"- 89",val:-89}, {display:"14",val:14}],
+        [{display:"38",val:38}, {display:"60",val:60}, {display:"- 95",val:-95}, {display:"41",val:41}],
+        [{display:"49",val:49}, {display:"50",val:50}, {display:"- 68",val:-68}, {display:"12",val:12}],
+        [{display:"32",val:32}, {display:"50",val:50}, {display:"17",val:17}, {display:"- 69",val:-69}],
+        [{display:"98",val:98}, {display:"- 73",val:-73}, {display:"24",val:24}, {display:"50",val:50}]
+    ],
+    // Set 6
+    [
+        [{display:"75",val:75}, {display:"24",val:24}, {display:"- 69",val:-69}, {display:"13",val:13}],
+        [{display:"87",val:87}, {display:"10",val:10}, {display:"- 95",val:-95}, {display:"46",val:46}],
+        [{display:"84",val:84}, {display:"15",val:15}, {display:"- 97",val:-97}, {display:"60",val:60}],
+        [{display:"17",val:17}, {display:"20",val:20}, {display:"- 35",val:-35}, {display:"86",val:86}],
+        [{display:"53",val:53}, {display:"41",val:41}, {display:"- 82",val:-82}, {display:"70",val:70}],
+        [{display:"94",val:94}, {display:"- 82",val:-82}, {display:"50",val:50}, {display:"36",val:36}],
+        [{display:"10",val:10}, {display:"23",val:23}, {display:"65",val:65}, {display:"- 97",val:-97}],
+        [{display:"24",val:24}, {display:"70",val:70}, {display:"- 93",val:-93}, {display:"81",val:81}],
+        [{display:"94",val:94}, {display:"- 83",val:-83}, {display:"76",val:76}, {display:"12",val:12}],
+        [{display:"94",val:94}, {display:"- 83",val:-83}, {display:"60",val:60}, {display:"25",val:25}]
+    ],
+    // Set 7
+    [
+        [{display:"42",val:42}, {display:"51",val:51}, {display:"- 83",val:-83}, {display:"60",val:60}],
+        [{display:"89",val:89}, {display:"- 74",val:-74}, {display:"30",val:30}, {display:"51",val:51}],
+        [{display:"75",val:75}, {display:"24",val:24}, {display:"- 89",val:-89}, {display:"13",val:13}],
+        [{display:"93",val:93}, {display:"- 81",val:-81}, {display:"20",val:20}, {display:"67",val:67}],
+        [{display:"65",val:65}, {display:"24",val:24}, {display:"- 83",val:-83}, {display:"91",val:91}],
+        [{display:"49",val:49}, {display:"50",val:50}, {display:"- 37",val:-37}, {display:"26",val:26}],
+        [{display:"14",val:14}, {display:"65",val:65}, {display:"20",val:20}, {display:"- 73",val:-73}],
+        [{display:"69",val:69}, {display:"20",val:20}, {display:"- 87",val:-87}, {display:"45",val:45}],
+        [{display:"59",val:59}, {display:"40",val:40}, {display:"- 86",val:-86}, {display:"71",val:71}],
+        [{display:"98",val:98}, {display:"- 73",val:-73}, {display:"62",val:62}, {display:"10",val:10}]
+    ],
+    // Set 8
+    [
+        [{display:"25",val:25}, {display:"64",val:64}, {display:"10",val:10}, {display:"- 78",val:-78}],
+        [{display:"14",val:14}, {display:"85",val:85}, {display:"- 93",val:-93}, {display:"62",val:62}],
+        [{display:"40",val:40}, {display:"57",val:57}, {display:"- 92",val:-92}, {display:"83",val:83}],
+        [{display:"89",val:89}, {display:"- 64",val:-64}, {display:"53",val:53}, {display:"10",val:10}],
+        [{display:"24",val:24}, {display:"50",val:50}, {display:"- 73",val:-73}, {display:"91",val:91}],
+        [{display:"76",val:76}, {display:"23",val:23}, {display:"- 89",val:-89}, {display:"14",val:14}],
+        [{display:"47",val:47}, {display:"- 35",val:-35}, {display:"60",val:60}, {display:"12",val:12}],
+        [{display:"87",val:87}, {display:"10",val:10}, {display:"- 96",val:-96}, {display:"43",val:43}],
+        [{display:"98",val:98}, {display:"- 76",val:-76}, {display:"52",val:52}, {display:"10",val:10}],
+        [{display:"79",val:79}, {display:"- 68",val:-68}, {display:"30",val:30}, {display:"52",val:52}]
+    ],
+    // Set 9
+    [
+        [{display:"29",val:29}, {display:"50",val:50}, {display:"- 67",val:-67}, {display:"81",val:81}],
+        [{display:"84",val:84}, {display:"15",val:15}, {display:"- 97",val:-97}, {display:"30",val:30}],
+        [{display:"98",val:98}, {display:"- 63",val:-63}, {display:"10",val:10}, {display:"52",val:52}],
+        [{display:"16",val:16}, {display:"73",val:73}, {display:"- 82",val:-82}, {display:"40",val:40}],
+        [{display:"74",val:74}, {display:"25",val:25}, {display:"- 89",val:-89}, {display:"13",val:13}],
+        [{display:"79",val:79}, {display:"- 64",val:-64}, {display:"31",val:31}, {display:"52",val:52}],
+        [{display:"46",val:46}, {display:"- 35",val:-35}, {display:"78",val:78}, {display:"10",val:10}],
+        [{display:"94",val:94}, {display:"- 63",val:-63}, {display:"52",val:52}, {display:"10",val:10}],
+        [{display:"69",val:69}, {display:"20",val:20}, {display:"- 87",val:-87}, {display:"45",val:45}],
+        [{display:"79",val:79}, {display:"20",val:20}, {display:"- 84",val:-84}, {display:"63",val:63}]
+    ],
+    // Set 10
+    [
+        [{display:"87",val:87}, {display:"- 62",val:-62}, {display:"10",val:10}, {display:"54",val:54}],
+        [{display:"29",val:29}, {display:"60",val:60}, {display:"- 74",val:-74}, {display:"31",val:31}],
+        [{display:"78",val:78}, {display:"- 26",val:-26}, {display:"15",val:15}, {display:"30",val:30}],
+        [{display:"14",val:14}, {display:"25",val:25}, {display:"- 39",val:-39}, {display:"80",val:80}],
+        [{display:"50",val:50}, {display:"39",val:39}, {display:"- 87",val:-87}, {display:"41",val:41}],
+        [{display:"76",val:76}, {display:"23",val:23}, {display:"- 89",val:-89}, {display:"51",val:51}],
+        [{display:"73",val:73}, {display:"26",val:26}, {display:"- 94",val:-94}, {display:"80",val:80}],
+        [{display:"30",val:30}, {display:"68",val:68}, {display:"- 97",val:-97}, {display:"45",val:45}],
+        [{display:"73",val:73}, {display:"26",val:26}, {display:"- 94",val:-94}, {display:"51",val:51}],
+        [{display:"46",val:46}, {display:"51",val:51}, {display:"- 90",val:-90}, {display:"82",val:82}]
+    ]
+];
+
+        function generateQuestions() {
+    questions = [];
+    const negativeListPart2 = [12, 14, 17, 19];
+    const negativeListPart3 = [22, 24, 27, 29];
+    
+    let chosenSetIndex = Math.floor(Math.random() * bankSoal10Set.length);
+    let selectedPart1Bank = bankSoal10Set[chosenSetIndex];
+
+    for (let i = 1; i <= 30; i++) {
+        let rowCount = (i <= 10) ? 4 : 10;
+        let numbersList = [];
+        let tempTotal = 0;
+
+        if (i <= 10) {
+            numbersList = selectedPart1Bank[i - 1];
+            tempTotal = numbersList.reduce((acc, row) => acc + row.val, 0);
+        } else {
+            let valid = false;
+            let candidateRows = [];
+            let candidateTotal = 0;
+            let isPart3 = (i >= 21);
+            let hasNegative = isPart3 ? negativeListPart3.includes(i) : negativeListPart2.includes(i);
+            let attempts = 0;
+            let startWithPuluhan = (i % 2 !== 0);
+
+            while (!valid && attempts < 5000) {
+                attempts++;
+
+                let zeroCount = Math.random() < 0.5 ? 1 : 2;
+                let roundTensPool = [10, 20, 30, 40, 50, 60, 70, 80, 90];
+                roundTensPool.sort(() => Math.random() - 0.5);
+                let chosenRoundTens = roundTensPool.slice(0, zeroCount);
+
+                let nonRoundTens = [];
+                while (nonRoundTens.length < (5 - zeroCount)) {
+                    let num = Math.floor(Math.random() * 89) + 11;
+                    if (num % 10 !== 0 && !nonRoundTens.includes(num)) {
+                        nonRoundTens.push(num);
+                    }
+                }
+
+                let chosenTens = [...chosenRoundTens, ...nonRoundTens];
+                chosenTens.sort(() => Math.random() - 0.5);
+
+                let chosenUnits = [];
+                for (let u = 0; u < 5; u++) {
+                    chosenUnits.push(Math.floor(Math.random() * 9) + 1);
+                }
+
+                let combined = [];
+                let tIdx = 0, uIdx = 0;
+                for (let r = 0; r < 10; r++) {
+                    let isPuluhan = startWithPuluhan ? (r % 2 === 0) : (r % 2 !== 0);
+                    if (isPuluhan) {
+                        combined.push(chosenTens[tIdx++]);
+                    } else {
+                        combined.push(chosenUnits[uIdx++]);
+                    }
+                }
+
+                let digitCounts = {};
+                for (let num of combined) {
+                    let str = num.toString();
+                    for (let char of str) {
+                        let d = parseInt(char);
+                        digitCounts[d] = (digitCounts[d] || 0) + 1;
+                    }
+                }
+
+                let allPresent = true;
+                let maxTwo = true;
+                for (let d = 0; d <= 9; d++) {
+                    if (!digitCounts[d] || digitCounts[d] < 1) {
+                        allPresent = false;
+                        break;
+                    }
+                    if (digitCounts[d] > 2) {
+                        maxTwo = false;
+                        break;
+                    }
+                }
+
+                if (allPresent && maxTwo) {
+                    let totalDigits = Object.values(digitCounts).reduce((a, b) => a + b, 0);
+                    if (totalDigits === 15) {
+                        let tempSum = 0;
+                        let tempRows = [];
+                        let possible = true;
+                        
+                        let puluhanIndices = [];
+                        let satuanIndices = [];
+                        for (let r = 0; r < 10; r++) {
+                            if (combined[r] >= 10) {
+                                puluhanIndices.push(r);
+                            } else {
+                                satuanIndices.push(r);
+                            }
+                        }
+
+                        let chosenNegPuluhan = new Set();
+                        let chosenNegSatuan = new Set();
+
+                        if (hasNegative) {
+                            if (puluhanIndices.length >= 1 && satuanIndices.length >= 2) {
+                                let pIdxRand = puluhanIndices[Math.floor(Math.random() * puluhanIndices.length)];
+                                chosenNegPuluhan.add(pIdxRand);
+                                let sCopy = [...satuanIndices];
+                                sCopy.sort(() => Math.random() - 0.5);
+                                chosenNegSatuan.add(sCopy[0]);
+                                chosenNegSatuan.add(sCopy[1]);
+                            } else {
+                                possible = false;
+                            }
+                        }
+
+                        if (possible) {
+                            // Simulasi pengecekan akumulasi nilai agar tidak minus di tengah jalan
+                            let simulationSum = 0;
+                            for (let r = 0; r < 10; r++) {
+                                let baseVal = combined[r];
+                                let isMinus = hasNegative && (chosenNegPuluhan.has(r) || chosenNegSatuan.has(r));
+
+                                if (isMinus) {
+                                    if (simulationSum >= baseVal) {
+                                        simulationSum -= baseVal;
+                                    } else {
+                                        possible = false;
+                                        break;
+                                    }
+                                } else {
+                                    simulationSum += baseVal;
+                                }
+                            }
+
+                            // Jika simulasi berhasil, masukkan ke tempRows yang asli
+                            if (possible) {
+                                for (let r = 0; r < 10; r++) {
+                                    let baseVal = combined[r];
+                                    let isMinus = hasNegative && (chosenNegPuluhan.has(r) || chosenNegSatuan.has(r));
+
+                                    if (isMinus) {
+                                        tempSum -= baseVal;
+                                        tempRows.push({ display: `- ${baseVal}`, val: -baseVal });
+                                    } else {
+                                        tempSum += baseVal;
+                                        tempRows.push({ display: `${baseVal}`, val: baseVal });
+                                    }
+                                }
+                            }
+                        }
+
+                        if (possible) {
+                            candidateTotal = tempSum;
+                            candidateRows = tempRows;
+                            valid = true;
+                        }
+                    }
+                }
+            }
+
+            if (!valid) {
+                let combined = startWithPuluhan ? 
+                    [10, 6, 25, 7, 34, 8, 42, 9, 58, 3] : 
+                    [6, 10, 7, 25, 8, 34, 9, 42, 3, 58];
+                
+                candidateRows = [];
+                candidateTotal = 0;
+                for (let r = 0; r < 10; r++) {
+                    let baseVal = combined[r];
+                    candidateTotal += baseVal;
+                    candidateRows.push({ display: `${baseVal}`, val: baseVal });
+                }
+            }
+
+            numbersList = candidateRows;
+            tempTotal = candidateTotal;
+        }
+
+        questions.push({
+            id: i,
+            rowCount: rowCount,
+            rows: numbersList,
+            answer: tempTotal
+        });
+    }
+}
+
+        function renderTablePart(start, end, rowCount, elementId, active) {
+            let table = document.getElementById(elementId);
+            let html = '<thead><tr><th class="col-no">NO</th>';
+            
+            for (let i = start; i <= end; i++) {
+                html += `<th>${i}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            for (let r = 0; r < rowCount; r++) {
+                html += `<tr class="number-row"><td class="col-no" style="text-align: center; padding-right: 0; font-weight: normal; font-style: normal; font-size: 11px; background-color: #f8f9fa;">${r+1}</td>`;
+                for (let i = start - 1; i < end; i++) {
+                    let val = (active && questions[i] && questions[i].rows[r]) ? questions[i].rows[r].display : '';
+                    html += `<td>${val}</td>`;
+                }
+                html += '</tr>';
+            }
+
+            html += '<tr><td class="col-no" style="text-align: center; font-weight: bold; font-size: 11px; font-style: normal; background-color: #f8f9fa;">Jawaban</td>';
+            for (let i = start; i <= end; i++) {
+                let disabledAttr = active ? '' : 'disabled';
+                let placeholderText = active ? '' : '-';
+                html += `<td><input type="text" inputmode="numeric" class="ans-input" id="ans-${i}" data-qid="${i}" ${disabledAttr} placeholder="${placeholderText}" onkeydown="handleEnter(event, ${i})"></td>`;
+            }
+            html += '</tr></tbody>';
+
+            table.innerHTML = html;
+        }
+
+        function renderTables(active) {
+            renderTablePart(1, 10, 4, 'gridPart1', active);
+            renderTablePart(11, 20, 10, 'gridPart2', active);
+            renderTablePart(21, 30, 10, 'gridPart3', active);
+        }
+
+        function handleEnter(event, currentQid) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                let currentInput = document.getElementById(`ans-${currentQid}`);
+                if (currentInput) currentInput.blur();
+
+                let nextQid = currentQid + 1;
+                let nextInput = document.getElementById(`ans-${nextQid}`);
+                if (nextInput) {
+                    nextInput.focus();
+                    nextInput.select();
+                } else if (currentQid === 30) {
+                    finishTest();
+                }
+            }
+        }
+
+        function startTest() {
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            isTestActive = true;
+            document.getElementById('startBtn').disabled = true;
+            generateQuestions();
+            renderTables(true);
+            
+            let firstInput = document.getElementById('ans-1');
+            if (firstInput) firstInput.focus();
+            
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    let minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                    let seconds = String(timeLeft % 60).padStart(2, '0');
+                    document.getElementById('timerDisplay').innerText = `Sedang mengerjakan ${minutes}:${seconds}`;
+                } else {
+                    clearInterval(timerInterval);
+                    isTestActive = false;
+                    checkScoring();
+                    document.getElementById('timerDisplay').innerText = "Waktu Habis";
+                    document.getElementById('timeUpModal').style.display = 'flex';
+                }
+            }, 1000);
+        }
+
+        function closeModal() {
+            document.getElementById('timeUpModal').style.display = 'none';
+        }
+
+        function finishTest() {
+            if (!isTestActive) return;
+            clearInterval(timerInterval);
+            isTestActive = false;
+            document.getElementById('timerDisplay').innerText = "Selesai";
+            checkScoring();
+        }
+
+        function checkScoring() {
+            let score = 0;
+            questions.forEach(q => {
+                let inputElem = document.getElementById(`ans-${q.id}`);
+                if (!inputElem) return;
+                
+                inputElem.disabled = true;
+                let rawValue = inputElem.value.trim();
+                inputElem.classList.remove('correct', 'incorrect');
+
+                if (rawValue === "") return;
+
+                if (rawValue === q.answer.toString()) {
+                    score += 10;
+                    inputElem.classList.add('correct');
+                } else {
+                    inputElem.classList.add('incorrect');
+                }
+            });
+            document.getElementById('finalScore').innerText = score;
+        }
+
+        function resetTest() {
+            clearInterval(timerInterval);
+            isTestActive = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('timeUpModal').style.display = 'none';
+            document.getElementById('timerDisplay').innerText = "Siap mengerjakan 01:00";
+            document.getElementById('finalScore').innerText = "0";
+            renderTables(false);
+        }
+
+        resetTest();
+    </script>
+</body>
+</html>

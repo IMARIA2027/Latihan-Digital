@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latihan IMARIA Nasional 2027 - Kategori C/D - Ekstra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Merriweather Sans', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }
+        .header-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+        }
+        .title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .controls button {
+            font-family: 'Merriweather Sans', sans-serif;
+            padding: 6px 12px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .controls button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .btn-online { background-color: #d4edda; color: #155724; }
+        .btn-finish { background-color: #cce5ff; color: #004085; }
+        .btn-reset { background-color: #f8d7da; color: #721c24; }
+        
+        .timer {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .score-box {
+            border: 2px solid #000;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            background: #fff;
+        }
+
+        .table-section {
+            background: #fff;
+            margin-bottom: 15px;
+            border: 1px solid #999;
+            overflow-x: auto;
+        }
+
+        .bottom-sections-wrapper {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .bottom-section {
+            flex: 1;
+            min-width: 300px;
+            background: #fff;
+            margin-bottom: 15px;
+            border: 1px solid #999;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #999;
+            padding: 4px 3px;
+            font-size: 14px;
+        }
+        th.col-no, td.col-no {
+            width: 45px;
+            min-width: 45px;
+            max-width: 45px;
+        }
+        th {
+            background-color: #e2e2e2;
+            font-size: 11px;
+            font-style: italic;
+            font-weight: normal;
+        }
+        
+        .ans-cell-container {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            padding: 1px 3px;
+            width: 82%;
+            margin: 0 auto;
+        }
+
+        .ans-currency {
+            font-size: 12px;
+            font-weight: bold;
+            font-style: italic;
+            color: #222;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        .ans-input {
+            font-family: 'Merriweather Sans', sans-serif;
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            text-align: center;
+            font-size: 13px;
+            padding: 0;
+        }
+
+        .number-row td:not(.col-no) {
+            position: relative; 
+            font-family: 'Merriweather Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            font-style: italic; 
+            height: 22px;
+            padding-right: 15px;
+            text-align: right;
+        }
+        
+        .currency-symbol {
+            position: absolute;
+            left: 6px;
+        }
+
+        .correct-box { background-color: #d4edda !important; border-color: #28a745 !important; }
+        .incorrect-box { background-color: #f8d7da !important; border-color: #dc3545 !important; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 25px 30px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 260px;
+            border: 1px solid #ccc;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #dc3545;
+            font-size: 20px;
+        }
+        .modal-btn {
+            background-color: #004085;
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Merriweather Sans', sans-serif;
+        }
+        .modal-btn:hover {
+            background-color: #002752;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay" id="timeUpModal">
+        <div class="modal-content">
+            <h3>Waktu Habis</h3>
+            <button class="modal-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <div class="header-container">
+        <div>
+            <span class="title">Latihan IMARIA Nasional 2027</span>
+            <div style="font-size: 13px; margin-top: 5px;" class="controls">
+                Tambah Kurang (Nilai @10) & Kali/Bagi (Nilai @5) &nbsp;|&nbsp; 
+                <button id="startBtn" class="btn-online" onclick="startTest()">Mulai Mengerjakan</button>
+                <button class="btn-finish" onclick="finishTest()">Selesai</button>
+                <button class="btn-reset" onclick="resetTest()">Atur Ulang</button>
+                <span class="timer" id="timerDisplay">Siap mengerjakan 01:00</span>
+            </div>
+        </div>
+        <div>
+            <span style="font-weight: bold; font-size: 15px;">Kategori C/D - Ekstra</span>
+            <div style="font-size: 12px; margin-top: 4px;">Batas waktu: 1 menit</div>
+        </div>
+        <div class="score-box">
+            NILAI <span id="finalScore">0</span>
+        </div>
+    </div>
+
+    <!-- Bagian Tambah Kurang Full Lebar -->
+    <div class="table-section">
+        <div style="background-color: #e2e2e2; padding: 6px; font-size: 13px; font-weight: bold; text-align: center; border-bottom: 1px solid #999;">TAMBAH KURANG</div>
+        <table id="gridTambahKurang"></table>
+    </div>
+
+    <!-- Bagian Bawah: Kali & Bagi berdampingan -->
+    <div class="bottom-sections-wrapper">
+        <div class="bottom-section">
+            <div style="background-color: #e2e2e2; padding: 6px; font-size: 13px; font-weight: bold; text-align: center; border-bottom: 1px solid #999;">PERKALIAN</div>
+            <table id="gridMultiply"></table>
+        </div>
+        <div class="bottom-section">
+            <div style="background-color: #e2e2e2; padding: 6px; font-size: 13px; font-weight: bold; text-align: center; border-bottom: 1px solid #999;">PEMBAGIAN</div>
+            <table id="gridDivide"></table>
+        </div>
+    </div>
+
+    <script>
+        let tkQuestions = [];
+        let multiplyQuestions = [];
+        let divideQuestions = [];
+        let timerInterval;
+        let timeLeft = 60;
+        let isTestActive = false;
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function formatNumberWithDot(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function generateQuestions() {
+            tkQuestions = [];
+            let mandatoryMinusNos = [2, 4, 7, 9];
+            
+            for (let i = 1; i <= 10; i++) {
+                let rowCount = 10;
+                let validQuestion = false;
+                let numbersList = [];
+                let currentTotal = 0;
+                let isMinusQuestion = mandatoryMinusNos.includes(i);
+
+                while (!validQuestion) {
+                    numbersList = [];
+                    let runningTotal = 0;
+                    let sequenceValid = true;
+
+                    let minusIndices = [];
+                    if (isMinusQuestion) {
+                        let availableIndices = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                        availableIndices.sort(() => Math.random() - 0.5);
+                        minusIndices = availableIndices.slice(0, 3);
+                    }
+
+                    // Pool 20 digit: Angka 0-9 masing-masing tepat 2 kali
+                    let digitPool = [];
+                    for (let d = 0; d <= 9; d++) {
+                        digitPool.push(d, d);
+                    }
+                    digitPool.sort(() => Math.random() - 0.5);
+
+                    let generatedRows = [];
+                    let rowBuildValid = true;
+                    let usedValuesInQuestion = new Set(); // Mencegah angka kembar dalam 1 kolom/soal
+
+                    for (let r = 0; r < 10; r++) {
+                        let d1 = digitPool.pop();
+                        if (d1 === 0) {
+                            let nonZeroIdx = digitPool.findIndex(val => val !== 0);
+                            if (nonZeroIdx !== -1) {
+                                digitPool[nonZeroIdx] = 0;
+                                d1 = digitPool.splice(nonZeroIdx, 1)[0];
+                            } else {
+                                rowBuildValid = false;
+                                break;
+                            }
+                        }
+                        let d2 = digitPool.pop();
+
+                        let intVal = d1 * 10 + d2;
+
+                        // Pastikan tidak ada angka yang sama persis dalam 1 kolom soal (misal 10 dan 10)
+                        if (usedValuesInQuestion.has(intVal)) {
+                            rowBuildValid = false;
+                            break;
+                        }
+                        usedValuesInQuestion.add(intVal);
+
+                        let displayStr = `${intVal}`;
+                        let isMinus = isMinusQuestion && minusIndices.includes(r);
+
+                        if (r === 0) {
+                            runningTotal += intVal;
+                            generatedRows.push({ display: displayStr, val: intVal, isFirst: true });
+                        } else {
+                            if (isMinus) {
+                                if (runningTotal >= intVal) {
+                                    runningTotal -= intVal;
+                                    generatedRows.push({ display: `- ${displayStr}`, val: -intVal, isFirst: false });
+                                } else {
+                                    sequenceValid = false;
+                                    break;
+                                }
+                            } else {
+                                runningTotal += intVal;
+                                generatedRows.push({ display: `${displayStr}`, val: intVal, isFirst: false });
+                            }
+                        }
+                    }
+
+                    if (rowBuildValid && sequenceValid && runningTotal >= 0) {
+                        currentTotal = runningTotal;
+                        numbersList = generatedRows;
+                        validQuestion = true;
+                    }
+                }
+
+                tkQuestions.push({
+                    id: i,
+                    rowCount: rowCount,
+                    rows: numbersList,
+                    answer: formatNumberWithDot(currentTotal)
+                });
+            }
+
+            // Generate 30 digits for hundreds (3 digits per question across 10 questions, each digit 0-9 used exactly 3 times)
+            let multHundredsPool = [];
+            for (let d = 0; d <= 9; d++) {
+                for (let c = 0; c < 3; c++) {
+                    multHundredsPool.push(d);
+                }
+            }
+            multHundredsPool.sort(() => Math.random() - 0.5);
+
+            let multMultipliersPool = [];
+            for (let d = 2; d <= 9; d++) {
+                multMultipliersPool.push(d);
+            }
+            for (let i = 0; i < 2; i++) {
+                multMultipliersPool.push(getRandomInt(2, 9));
+            }
+            multMultipliersPool.sort(() => Math.random() - 0.5);
+
+            multiplyQuestions = [];
+            let poolIdx = 0;
+            for (let i = 1; i <= 10; i++) {
+                let h1 = multHundredsPool[poolIdx++];
+                if (h1 === 0) h1 = getRandomInt(1, 9);
+                let h2 = multHundredsPool[poolIdx++];
+                let h3 = multHundredsPool[poolIdx++];
+                let a = h1 * 100 + h2 * 10 + h3;
+
+                let b = multMultipliersPool[i - 1];
+
+                multiplyQuestions.push({
+                    id: i,
+                    display: `${formatNumberWithDot(a)} × ${b}`,
+                    answer: formatNumberWithDot(a * b)
+                });
+            }
+
+            // Generate Pembagian: Tepat 2 nomor puluhan dibagi satuan (hasil puluhan), sisanya ratusan dibagi satuan (hasil ratusan)
+            // Generate Pembagian: Pastikan semua hasilnya adalah bilangan bulat murni
+        // Generate Pembagian: Tepat 2 soal angka yang dibagi (dividend) berupa puluhan, 8 soal berupa ratusan. 
+        // Semua hasil akhir (quotient) dijamin berupa bilangan puluhan bulat.
+        divideQuestions = [];
+        
+        let tensIndices = [];
+        let allIndices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        allIndices.sort(() => Math.random() - 0.5);
+        tensIndices = allIndices.slice(0, 2);
+
+        let divDivisorsPool = [];
+        for (let d = 2; d <= 9; d++) {
+            divDivisorsPool.push(d);
+        }
+        for (let i = 0; i < 2; i++) {
+            divDivisorsPool.push(getRandomInt(2, 9));
+        }
+        divDivisorsPool.sort(() => Math.random() - 0.5);
+
+        for (let i = 1; i <= 10; i++) {
+            let divisor = divDivisorsPool[i - 1];
+            let dividend, quotient;
+
+            if (tensIndices.includes(i)) {
+                // Tepat 2 soal: Angka yang dibagi (dividend) adalah puluhan (10-99), hasil bagi (quotient) wajib puluhan (10-99)
+                do {
+                    quotient = getRandomInt(10, 99);
+                    dividend = quotient * divisor;
+                } while (dividend < 10 || dividend > 99);
+            } else {
+                // 8 soal sisanya: Angka yang dibagi (dividend) adalah ratusan, tapi hasil bagi (quotient) tetap wajib puluhan (10-99)
+                do {
+                    quotient = getRandomInt(10, 99);
+                    dividend = quotient * divisor;
+                } while (dividend < 100 || dividend > 999);
+            }
+
+            divideQuestions.push({
+                id: i,
+                display: `${formatNumberWithDot(dividend)} ÷ ${divisor}`,
+                answer: formatNumberWithDot(quotient)
+            });
+        }
+        }
+
+        function renderTkTable(active) {
+            let table = document.getElementById('gridTambahKurang');
+            if (!table) return;
+            let html = '<thead><tr><th class="col-no">NO</th>';
+            for (let i = 1; i <= 10; i++) {
+                html += `<th>${i}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            for (let r = 0; r < 10; r++) {
+                html += `<tr class="number-row"><td class="col-no" style="text-align: center; padding-right: 0; font-weight: normal; font-style: normal; font-size: 11px; background-color: #f8f9fa;">${r+1}</td>`;
+                for (let i = 0; i < 10; i++) {
+                    let cellData = (active && tkQuestions[i] && tkQuestions[i].rows[r]) ? tkQuestions[i].rows[r] : null;
+                    if (cellData) {
+                        if (cellData.isFirst) {
+                            html += `<td><span class="currency-symbol">$</span>${cellData.display}</td>`;
+                        } else {
+                            html += `<td>${cellData.display}</td>`;
+                        }
+                    } else {
+                        html += `<td></td>`;
+                    }
+                }
+                html += '</tr>';
+            }
+
+            html += '<tr><td class="col-no" style="text-align: center; font-weight: bold; font-size: 11px; font-style: normal; background-color: #f8f9fa;">Jawaban</td>';
+            for (let i = 1; i <= 10; i++) {
+                let disabledAttr = active ? '' : 'disabled';
+                let placeholderText = active ? '' : '-';
+                html += `<td>
+                            <div class="ans-cell-container" id="container-tk-${i}">
+                                <span class="ans-currency">$</span>
+                                <input type="text" class="ans-input" id="ans-tk-${i}" data-qid="${i}" ${disabledAttr} placeholder="${placeholderText}" onkeydown="handleEnter(event, 'tk', ${i})">
+                            </div>
+                         </td>`;
+            }
+            html += '</tr></tbody>';
+            table.innerHTML = html;
+        }
+
+        function renderTableSection(questionsList, elementId, active, titlePrefix) {
+            let table = document.getElementById(elementId);
+            if (!table) return;
+            let html = '<thead><tr><th class="col-no">NO</th><th>SOAL</th><th style="width: 130px;">JAWABAN</th></tr></thead><tbody>';
+
+            for (let i = 0; i < questionsList.length; i++) {
+                let q = questionsList[i];
+                let qid = q.id;
+                let disabledAttr = active ? '' : 'disabled';
+                let placeholderText = active ? '' : '-';
+                let displayVal = active ? q.display : '...';
+
+                html += `<tr class="number-row" style="height: 28px;">
+                    <td class="col-no" style="text-align: center; font-weight: normal; font-style: normal; font-size: 11px; background-color: #f8f9fa; padding-right:0;">${qid}</td>
+                    <td style="text-align: center; padding-right:0;">${displayVal}</td>
+                    <td>
+                        <div class="ans-cell-container" id="container-${titlePrefix}-${qid}" style="width: 90%;">
+                            <input type="text" class="ans-input" id="ans-${titlePrefix}-${qid}" data-qid="${qid}" ${disabledAttr} placeholder="${placeholderText}" onkeydown="handleEnter(event, '${titlePrefix}', ${qid})">
+                        </div>
+                    </td>
+                </tr>`;
+            }
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+
+        function renderTables(active) {
+            renderTkTable(active);
+            renderTableSection(multiplyQuestions, 'gridMultiply', active, 'm');
+            renderTableSection(divideQuestions, 'gridDivide', active, 'd');
+        }
+
+        function handleEnter(event, prefix, currentQid) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                let nextQid = currentQid + 1;
+                let nextInput = document.getElementById(`ans-${prefix}-${nextQid}`);
+                if (nextInput) {
+                    nextInput.focus();
+                    nextInput.select();
+                } else if (prefix === 'tk') {
+                    let firstMult = document.getElementById('ans-m-1');
+                    if (firstMult) { firstMult.focus(); firstMult.select(); }
+                } else if (prefix === 'm') {
+                    let firstDiv = document.getElementById('ans-d-1');
+                    if (firstDiv) { firstDiv.focus(); firstDiv.select(); }
+                } else if (prefix === 'd' && currentQid === 10) {
+                    finishTest();
+                }
+            }
+        }
+
+        function startTest() {
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            isTestActive = true;
+            document.getElementById('startBtn').disabled = true;
+            generateQuestions();
+            renderTables(true);
+            
+            let firstInput = document.getElementById('ans-tk-1');
+            if (firstInput) firstInput.focus();
+            
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    let minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                    let seconds = String(timeLeft % 60).padStart(2, '0');
+                    document.getElementById('timerDisplay').innerText = `Sedang mengerjakan ${minutes}:${seconds}`;
+                } else {
+                    clearInterval(timerInterval);
+                    isTestActive = false;
+                    checkScoring();
+                    document.getElementById('timerDisplay').innerText = "Waktu Habis";
+                    document.getElementById('timeUpModal').style.display = 'flex';
+                }
+            }, 1000);
+        }
+
+        function closeModal() {
+            document.getElementById('timeUpModal').style.display = 'none';
+        }
+
+        function finishTest() {
+            if (!isTestActive) return;
+            clearInterval(timerInterval);
+            isTestActive = false;
+            document.getElementById('timerDisplay').innerText = "Selesai";
+            checkScoring();
+        }
+
+        function checkScoring() {
+            let score = 0;
+            
+            function validateAndScore(questionsList, prefix, points) {
+                questionsList.forEach(q => {
+                    let inputElem = document.getElementById(`ans-${prefix}-${q.id}`);
+                    let containerElem = document.getElementById(`container-${prefix}-${q.id}`);
+                    if (!inputElem || !containerElem) return;
+                    
+                    inputElem.disabled = true;
+                    let rawValue = inputElem.value.trim();
+                    containerElem.classList.remove('correct-box', 'incorrect-box');
+
+                    if (rawValue === "") return;
+
+                    if (rawValue === q.answer) {
+                        score += points;
+                        containerElem.classList.add('correct-box');
+                    } else {
+                        containerElem.classList.add('incorrect-box');
+                    }
+                });
+            }
+
+            validateAndScore(tkQuestions, 'tk', 10);
+            validateAndScore(multiplyQuestions, 'm', 5);
+            validateAndScore(divideQuestions, 'd', 5);
+
+            document.getElementById('finalScore').innerText = score;
+        }
+
+        function resetTest() {
+            clearInterval(timerInterval);
+            isTestActive = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('timeUpModal').style.display = 'none';
+            document.getElementById('timerDisplay').innerText = "Siap mengerjakan 01:00";
+            document.getElementById('finalScore').innerText = "0";
+            renderTables(false);
+        }
+
+        for (let i = 1; i <= 10; i++) {
+            tkQuestions.push({ id: i, rows: [], answer: "0" });
+            multiplyQuestions.push({ id: i, display: '', answer: "0" });
+            divideQuestions.push({ id: i, display: '', answer: "0" });
+        }
+        renderTables(false);
+    </script>
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latihan IMARIA Nasional 2027 - MA Bagi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Merriweather Sans', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 12px;
+            color: #000;
+        }
+        .header-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+        }
+        .title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .controls button {
+            font-family: 'Merriweather Sans', sans-serif;
+            padding: 6px 12px;
+            margin-right: 5px;
+            margin-bottom: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .btn-online { background-color: #d4edda; color: #155724; }
+        .btn-finish { background-color: #cce5ff; color: #004085; }
+        .btn-reset { background-color: #f8d7da; color: #721c24; }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed !important;
+        }
+
+        .timer {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .score-box {
+            border: 2px solid #000;
+            padding: 5px 14px;
+            border-radius: 5px;
+            font-weight: bold;
+            background: #fff;
+            font-size: 15px;
+        }
+
+        .container-columns {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .column-section {
+            flex: 1;
+            min-width: 290px;
+            background: #fff;
+            border: 1px solid #999;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid #999;
+            padding: 7px 6px;
+            font-size: 14px;
+        }
+        th {
+            background-color: #e2e2e2;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .col-no {
+            width: 38px;
+            background-color: #f8f9fa;
+            font-size: 13px;
+        }
+        .col-soal {
+            font-style: italic;
+            font-weight: 600;
+            text-align: center;
+            background-color: #fff;
+            font-size: 15px;
+        }
+        .col-jawab {
+            width: 95px;
+        }
+        .ans-input {
+            font-family: 'Merriweather Sans', sans-serif;
+            width: 85px;
+            padding: 4px;
+            text-align: center;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .correct { background-color: #d4edda !important; }
+        .incorrect { background-color: #f8d7da !important; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 25px 30px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 260px;
+            border: 1px solid #ccc;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #dc3545;
+            font-size: 20px;
+        }
+        .modal-btn {
+            background-color: #004085;
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Merriweather Sans', sans-serif;
+        }
+        .modal-btn:hover {
+            background-color: #002752;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay" id="timeUpModal">
+        <div class="modal-content">
+            <h3>Waktu Habis</h3>
+            <button class="modal-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <div class="header-container">
+        <div>
+            <span class="title">Latihan IMARIA Nasional 2027</span>
+            <div style="font-size: 13px; margin-top: 4px;">
+                30 Soal masing-masing nilai 5 &nbsp;|&nbsp; 
+                <button class="btn-online" id="startBtn" onclick="startTest()">Mulai Mengerjakan</button>
+                <button class="btn-finish" onclick="finishTest()">Selesai</button>
+                <button class="btn-reset" onclick="resetTest()">Atur Ulang</button>
+                <span class="timer" id="timerDisplay">Siap mengerjakan 01:00</span>
+            </div>
+        </div>
+        <div>
+            <span style="font-weight: bold; font-size: 15px;">Kategori C/D - MA Bagi</span>
+            <div style="font-size: 12px; margin-top: 3px;">Batas waktu: 1 menit</div>
+        </div>
+        <div class="score-box">
+            NILAI <span id="finalScore">0</span>
+        </div>
+    </div>
+
+    <div class="container-columns">
+        <div class="column-section">
+            <table id="tableCol1"></table>
+        </div>
+        <div class="column-section">
+            <table id="tableCol2"></table>
+        </div>
+        <div class="column-section">
+            <table id="tableCol3"></table>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let timerInterval;
+        let timeLeft = 60;
+        let isTestActive = false;
+
+        function generateRandomQuestions() {
+            questions = [];
+            let divisors = [2, 3, 4, 5, 6, 7, 8, 9];
+            let quotients = [2, 3, 4, 5, 6, 7, 8, 9]; 
+            
+            let allPairs = [];
+            for (let i = 0; i < divisors.length; i++) {
+                for (let j = 0; j < quotients.length; j++) {
+                    let div = divisors[i];
+                    let quot = quotients[j];
+                    let dividend = div * quot;
+                    allPairs.push({ dividend: dividend, divisor: div, quotient: quot });
+                }
+            }
+
+            allPairs.sort(() => Math.random() - 0.5);
+            let selectedPairs = allPairs.slice(0, 30);
+
+            for (let i = 0; i < 30; i++) {
+                let pair = selectedPairs[i];
+                let answer = pair.quotient;
+                let formattedAnswer = answer.toString();
+
+                questions.push({
+                    id: i + 1,
+                    num1: pair.dividend,
+                    num2: pair.divisor,
+                    display: pair.dividend + " ÷ " + pair.divisor,
+                    answer: answer,
+                    formattedAnswer: formattedAnswer
+                });
+            }
+        }
+
+        function renderColumn(start, end, elementId, active) {
+            let table = document.getElementById(elementId);
+            if (!table) return;
+            
+            let html = '<thead><tr><th class="col-no">No</th><th>Soal</th><th class="col-jawab">Jawaban</th></tr></thead><tbody>';
+            
+            for (let i = start; i <= end; i++) {
+                let qIndex = i - 1;
+                let qDisplay = (active && questions[qIndex]) ? questions[qIndex].display : '';
+                let disabledAttr = active ? '' : 'disabled';
+                let placeholderText = active ? '' : '-';
+
+                html += '<tr>' +
+                    '<td class="col-no">' + i + '</td>' +
+                    '<td class="col-soal">' + qDisplay + '</td>' +
+                    '<td class="col-jawab"><input type="text" inputmode="numeric" class="ans-input" id="ans-' + i + '" data-qid="' + i + '" ' + disabledAttr + ' placeholder="' + placeholderText + '" onkeydown="handleEnter(event, ' + i + ')"></td>' +
+                    '</tr>';
+            }
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+
+        function renderAllColumns(active) {
+            renderColumn(1, 10, 'tableCol1', active);
+            renderColumn(11, 20, 'tableCol2', active);
+            renderColumn(21, 30, 'tableCol3', active);
+        }
+
+        function handleEnter(event, currentQid) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                let nextQid = currentQid + 1;
+                let nextInput = document.getElementById('ans-' + nextQid);
+                if (nextInput) {
+                    nextInput.focus();
+                    nextInput.select();
+                } else if (currentQid === 30) {
+                    finishTest();
+                }
+            }
+        }
+
+        function startTest() {
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            isTestActive = true;
+            
+            document.getElementById('startBtn').disabled = true;
+            
+            generateRandomQuestions();
+            renderAllColumns(true);
+            
+            let firstInput = document.getElementById('ans-1');
+            if (firstInput) firstInput.focus();
+            
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    let minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                    let seconds = String(timeLeft % 60).padStart(2, '0');
+                    document.getElementById('timerDisplay').innerText = "Sedang mengerjakan " + minutes + ":" + seconds;
+                } else {
+                    clearInterval(timerInterval);
+                    isTestActive = false;
+                    checkScoring();
+                    document.getElementById('timerDisplay').innerText = "Waktu Habis";
+                    document.getElementById('timeUpModal').style.display = 'flex';
+                }
+            }, 1000);
+        }
+
+        function closeModal() {
+            document.getElementById('timeUpModal').style.display = 'none';
+        }
+
+        function finishTest() {
+            if (!isTestActive) return;
+            clearInterval(timerInterval);
+            isTestActive = false;
+            document.getElementById('timerDisplay').innerText = "Selesai";
+            checkScoring();
+        }
+
+        function checkScoring() {
+            let score = 0;
+            questions.forEach(q => {
+                let inputElem = document.getElementById('ans-' + q.id);
+                if (!inputElem) return;
+                
+                inputElem.disabled = true;
+                let rawValue = inputElem.value.trim();
+                inputElem.classList.remove('correct', 'incorrect');
+
+                if (rawValue === "") return;
+
+                if (rawValue === q.formattedAnswer) {
+                    score += 5;
+                    inputElem.classList.add('correct');
+                } else {
+                    inputElem.classList.add('incorrect');
+                }
+            });
+            document.getElementById('finalScore').innerText = score;
+        }
+
+        function resetTest() {
+            clearInterval(timerInterval);
+            isTestActive = false;
+            
+            document.getElementById('startBtn').disabled = false;
+
+            document.getElementById('timeUpModal').style.display = 'none';
+            document.getElementById('timerDisplay').innerText = "Siap mengerjakan 01:00";
+            document.getElementById('finalScore').innerText = "0";
+            
+            generateRandomQuestions();
+            renderAllColumns(false);
+        }
+
+        generateRandomQuestions();
+        renderAllColumns(false);
+    </script>
+</body>
+</html>
